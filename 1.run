@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo ""
+echo "http://192.168.1.80:3000/"
+echo ""
+yarn dev --host 0.0.0.0

@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  strapi:
+    build: .
+    container_name: ${STRAPI_CONTAINER_NAME}
+    restart: always
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      APP_KEYS: ${APP_KEYS}
+      NODE_ENV: ${NODE_ENV}
+      HOST: ${HOST}
+    entrypoint: ["yarn", "dev"] # for developemnt mode
+    # entrypoint: ["tail", "-f", "/dev/null"] # for developemnt mode
+    ports:
+      - "${EXPORT}:${PORT}"
+    volumes:
+      - ./.env:/opt/app/.env
+      - ./config:/opt/app/config
+      - ./public:/opt/app/public
+      - ./src:/opt/app/src
+      - ./types:/opt/app/types
+      - ./package.json:/opt/package.json
+      - ./yarn.lock:/opt/yarn.lock
+    depends_on:
+      - postgres
+    networks:
+      - strapi-network
+
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    container_name: ${POSTGRES_CONTAINER_NAME}
+    restart: always
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - strapi-network
+
+volumes:
+  postgres_data:
+
+networks:
+  strapi-network:

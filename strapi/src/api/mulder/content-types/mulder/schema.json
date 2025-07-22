@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "mulders",
+  "info": {
+    "singularName": "mulder",
+    "pluralName": "mulders",
+    "displayName": "mulder"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "text"
+    }
+  }
+}
