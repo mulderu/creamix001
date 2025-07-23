@@ -405,6 +405,70 @@ export interface ApiAddressAddress extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCaseCase extends Struct.CollectionTypeSchema {
+  collectionName: 'cases';
+  info: {
+    displayName: 'case';
+    pluralName: 'cases';
+    singularName: 'case';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    archived: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    excluded: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    institution_name: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
+      Schema.Attribute.Private;
+    manufacturer: Schema.Attribute.String;
+    manufacturer_model_name: Schema.Attribute.String;
+    modality: Schema.Attribute.Enumeration<
+      ['CT', 'MR', 'X-RAY', 'PANO', 'US', 'IMAGE', 'NIFTI']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'CT'>;
+    patient_birth_date: Schema.Attribute.String;
+    patient_id: Schema.Attribute.String;
+    patient_name: Schema.Attribute.String;
+    patient_sex: Schema.Attribute.Enumeration<['M', 'W', 'X']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'M'>;
+    publishedAt: Schema.Attribute.DateTime;
+    res_x: Schema.Attribute.Integer;
+    res_y: Schema.Attribute.Integer;
+    res_z: Schema.Attribute.Integer;
+    series_description: Schema.Attribute.String;
+    series_instance_uid: Schema.Attribute.String;
+    series_number: Schema.Attribute.String;
+    series_timestamp: Schema.Attribute.String;
+    source: Schema.Attribute.Enumeration<['upload', 'import']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'upload'>;
+    study_description: Schema.Attribute.String;
+    study_id: Schema.Attribute.String;
+    study_instance_uid: Schema.Attribute.String;
+    study_timestamp: Schema.Attribute.String;
+    tasks: Schema.Attribute.Relation<'oneToMany', 'api::task.task'>;
+    tasks_finished_count: Schema.Attribute.Integer;
+    tasks_new_count: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    tasks_processing_count: Schema.Attribute.Integer &
+      Schema.Attribute.DefaultTo<0>;
+    tasks_total_count: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users_permissions_user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiConfigConfig extends Struct.SingleTypeSchema {
   collectionName: 'configs';
   info: {
@@ -449,6 +513,10 @@ export interface ApiMulderMulder extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    files: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -490,6 +558,70 @@ export interface ApiProjectProject extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTaskTask extends Struct.CollectionTypeSchema {
+  collectionName: 'tasks';
+  info: {
+    displayName: 'task';
+    pluralName: 'tasks';
+    singularName: 'task';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    archived: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    case: Schema.Attribute.Relation<'manyToOne', 'api::case.case'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    deleted: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    feedback: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::task.task'> &
+      Schema.Attribute.Private;
+    payload: Schema.Attribute.JSON;
+    processing_finish_timestamp: Schema.Attribute.DateTime;
+    processing_last_update_timestamp: Schema.Attribute.DateTime;
+    processing_start_timestamp: Schema.Attribute.DateTime;
+    processors: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    worker: Schema.Attribute.Relation<'manyToOne', 'api::worker.worker'>;
+  };
+}
+
+export interface ApiWorkerWorker extends Struct.CollectionTypeSchema {
+  collectionName: 'workers';
+  info: {
+    displayName: 'worker';
+    pluralName: 'workers';
+    singularName: 'worker';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::worker.worker'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    tasks: Schema.Attribute.Relation<'oneToMany', 'api::task.task'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    working: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
   };
 }
 
@@ -948,10 +1080,10 @@ export interface PluginUsersPermissionsUser
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
@@ -1003,9 +1135,12 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::address.address': ApiAddressAddress;
+      'api::case.case': ApiCaseCase;
       'api::config.config': ApiConfigConfig;
       'api::mulder.mulder': ApiMulderMulder;
       'api::project.project': ApiProjectProject;
+      'api::task.task': ApiTaskTask;
+      'api::worker.worker': ApiWorkerWorker;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

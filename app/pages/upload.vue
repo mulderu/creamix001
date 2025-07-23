@@ -7,5 +7,5 @@ definePageMeta({
 </script>
 
 <template>
-  <case-grid-main />
+  <upload-main />
 </template>

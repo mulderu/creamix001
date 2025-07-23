@@ -1,0 +1,134 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cases",
+  "info": {
+    "singularName": "case",
+    "pluralName": "cases",
+    "displayName": "case"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "archived": {
+      "type": "boolean",
+      "default": false
+    },
+    "excluded": {
+      "type": "boolean",
+      "default": false
+    },
+    "tasks_finished_count": {
+      "type": "integer"
+    },
+    "tasks_new_count": {
+      "type": "integer",
+      "default": 0
+    },
+    "tasks_processing_count": {
+      "type": "integer",
+      "default": 0
+    },
+    "tasks_total_count": {
+      "type": "integer",
+      "default": 0
+    },
+    "res_x": {
+      "type": "integer"
+    },
+    "res_y": {
+      "type": "integer"
+    },
+    "res_z": {
+      "type": "integer"
+    },
+    "institution_name": {
+      "type": "string"
+    },
+    "manufacturer": {
+      "type": "string"
+    },
+    "manufacturer_model_name": {
+      "type": "string"
+    },
+    "modality": {
+      "type": "enumeration",
+      "required": true,
+      "default": "CT",
+      "enum": [
+        "CT",
+        "MR",
+        "X-RAY",
+        "PANO",
+        "US",
+        "IMAGE",
+        "NIFTI"
+      ]
+    },
+    "patient_birth_date": {
+      "type": "string"
+    },
+    "patient_id": {
+      "type": "string"
+    },
+    "patient_name": {
+      "type": "string"
+    },
+    "patient_sex": {
+      "type": "enumeration",
+      "required": true,
+      "default": "M",
+      "enum": [
+        "M",
+        "W",
+        "X"
+      ]
+    },
+    "series_description": {
+      "type": "string"
+    },
+    "series_instance_uid": {
+      "type": "string"
+    },
+    "series_number": {
+      "type": "string"
+    },
+    "series_timestamp": {
+      "type": "string"
+    },
+    "source": {
+      "type": "enumeration",
+      "required": true,
+      "default": "upload",
+      "enum": [
+        "upload",
+        "import"
+      ]
+    },
+    "study_description": {
+      "type": "string"
+    },
+    "study_id": {
+      "type": "string"
+    },
+    "study_instance_uid": {
+      "type": "string"
+    },
+    "study_timestamp": {
+      "type": "string"
+    },
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "cases"
+    },
+    "tasks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::task.task",
+      "mappedBy": "case"
+    }
+  }
+}

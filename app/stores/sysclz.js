@@ -1,11 +1,23 @@
+const stateVars = { 
+      user: useState("auth_user", () => null) ,
+      token: useState("auth_token", () => localStorage.getItem("token") || null),
+    }
+
 export class User {
   constructor(apiServer, $fetch) {
     this.apiServer = apiServer;
     this.$fetch = $fetch;
-    this.user = null;
-    this.token = localStorage.getItem("token") || null;
+    // this.user = null;
+    // this.token = localStorage.getItem("token") || null;
+    this.user = stateVars.user.value;
+    this.token = stateVars.token.value;
     this.loading = false;
     this.error = null;
+  }
+
+  setUserState() {
+    stateVars.token.value = this.token
+    stateVars.user.value = this.user
   }
 
   async login(email, password) {
@@ -20,6 +32,7 @@ export class User {
       this.user = data.user;
       this.token = data.jwt;
       localStorage.setItem("token", data.jwt);
+      this.setUserState()
     } catch (err) {
       console.log(err);
       this.error = err.message;
@@ -31,6 +44,7 @@ export class User {
   logout() {
     this.user = null;
     this.token = null;
+    this.setUserState()
     localStorage.removeItem("token");
     console.log("logout - done!");
   }
@@ -71,6 +85,7 @@ export class User {
       );
       this.user = data.user;
       this.token = data.jwt;
+      this.setUserState()
       localStorage.setItem("token", data.jwt);
     } catch (err) {
       this.error = err.message;
@@ -93,6 +108,7 @@ export class User {
       );
       this.user = data.user;
       this.token = data.jwt;
+      this.setUserState()
       localStorage.setItem("token", data.jwt);
     } catch (err) {
       this.error = err.message;
