@@ -1,12 +1,15 @@
 <script setup>
 const website = useWebsiteStore()
+const demoList = useDemoListStore()
 const { fetchWithAuth, uploadFiles } = useStrapiApi()
 
 await callOnce(website.fetch)
+await callOnce(demoList.fetch)
 
 
 const form1 = ref({title: "", body: ""})
 const files = ref([])
+const working = ref(false)
 const snackbar = ref(false)
 
 
@@ -17,6 +20,7 @@ const uploadFile = async () => {
 }
 
 const submitData = async () => {
+  working.value = true
   const r_files = await uploadFile()
   const { title, body } = form1.value
   const r_api = await fetchWithAuth('/api/mulders', {
@@ -29,7 +33,10 @@ const submitData = async () => {
   })
 
   console.log(r_api)
+  working.value = false
   snackbar.value = true
+
+  await demoList.fetch()
 }
 
 </script>
@@ -41,6 +48,12 @@ const submitData = async () => {
       <div>
         <h1>{{ website.name }}</h1>
         <p>{{ website.description }}</p>
+        <p>{{ demoList.data.length }}</p>
+        <ul>
+          <li class="border-b-sm" v-for="row in demoList.data">
+            {{ row.title }} / {{ row.body }} 
+          </li>
+        </ul>
       </div>
 
       <div class="py-4" />
@@ -90,6 +103,18 @@ const submitData = async () => {
         <p>Data was saved ...</p>
         <template v-slot:actions>
           <v-btn
+            v-if="working"
+            color="indigo"
+            variant="text"
+            @click="snackbar = false"
+          >
+            <v-progress-circular
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+          </v-btn>
+          <v-btn
+            v-else
             color="indigo"
             variant="text"
             @click="snackbar = false"

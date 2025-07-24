@@ -71,6 +71,10 @@
       "relation": "oneToMany",
       "target": "api::case.case",
       "mappedBy": "users_permissions_user"
+    },
+    "is_admin": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

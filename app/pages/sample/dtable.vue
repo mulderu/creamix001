@@ -40,7 +40,6 @@ function getStatusIcon(status) {
 
 definePageMeta({
   layout: "dash",
-  middleware: "auth",
 });
 </script>
 

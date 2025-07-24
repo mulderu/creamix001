@@ -7,9 +7,10 @@ const tab = shallowRef('favorites')
 const svc = { userStore: null }
 const router = useRouter()
 
-onMounted(() => {
+onMounted(async () => {
   svc.userStore = useUserStore()
 
+  console.log(svc.userStore.user.user)
 })
 
 const favorites = [
@@ -99,11 +100,10 @@ const onAddTask = () => {
           <div class="d-flex align-center justify-center pt-4">
             <router-link to="/dash">
               <v-avatar class="me-3"
-                image="https://phinf.pstatic.net/contact/20171029_113/15092554647254E72X_PNG/avatar_profile.png?type=s80"
+                image="http://192.168.1.80/logo/logo.png"
                 size="56" />
             </router-link>
-
-            <span class="text-h6 font-weight-medium">Dash</span>
+            <span class="text-h6 font-weight-medium">CREAM A.I.</span>
           </div>
 
           <v-divider class="my-4" />

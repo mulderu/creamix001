@@ -1,3 +1,5 @@
+// use on : app/components/UploadMain.vue
+//
 // composables/useStrapiApi.js
 // const { fetchWithAuth } = useStrapiApi()
 //
@@ -40,7 +42,7 @@ export const useStrapiApi = () => {
     for (const file of files) {
       formData.append('files', file)
     }
-    console.log(`Bearer ${token.value}`)
+    // console.log(`Bearer ${token.value}`)
 
     const res = await $fetch(`${config.public.apiBase}/api/upload`, {
       method: 'POST',
@@ -50,11 +52,19 @@ export const useStrapiApi = () => {
       }
     })
 
-    console.log(res)
-
+    // console.log(res)
     // return res.map(file => file.id)
     return res
   }
 
-  return { fetchWithAuth, uploadFiles };
+  const filterStr = cols => cols.map((arr, i) => `filters[${arr[0]}][$eq][${i}]=${arr[1]}`).join('&')
+  const filterExStr = cols => cols.map((arr, i) => `filters[${arr[0]}][${arr[1]}][${i}]=${arr[2]}`).join('&')
+  const fieldStr = cols => cols.map((nm, i) => `fields[${i}]=${nm}`).join('&')
+  const populateStr = cols => cols.map((nm, i) => `populate[${i}]=${nm}`).join('&')
+  const sortStr = cols => cols.map((nm, i) => `sort[${i}]=${nm}`).join('&')
+  const pageStr = (page, pageSize=20) => `pagination[page]=${page}&pagination[pageSize]=${pageSize}`
+
+  return { fetchWithAuth, uploadFiles, fieldStr, populateStr, sortStr, pageStr,
+    filterStr, filterExStr
+   };
 };

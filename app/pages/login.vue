@@ -37,7 +37,7 @@ definePageMeta({
       <v-container class="h-100 pa-0" fluid>
         <v-row align="center" class="h-100" justify="center">
           <v-responsive class="flex-1-1 px-4" max-width="475">
-            <v-img class="mx-auto mb-4" max-width="60" src="https://vuetifyjs.b-cdn.net/docs/images/logos/v.svg" />
+            <v-img class="mx-auto mb-4" max-width="160" src="http://192.168.1.80/logo/logo.png" />
 
             <div class="text-h5 text-center mb-8 font-weight-medium">Log into your account</div>
 

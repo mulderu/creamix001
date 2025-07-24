@@ -8,7 +8,7 @@ export class User {
     this.apiServer = apiServer;
     this.$fetch = $fetch;
     // this.user = null;
-    // this.token = localStorage.getItem("token") || null;
+    // this.token = localStorage.getItem("token") || null
     this.user = stateVars.user.value;
     this.token = stateVars.token.value;
     this.loading = false;
@@ -57,6 +57,7 @@ export class User {
         method: "GET",
         headers: { Authorization: `Bearer ${this.token}` },
       });
+      this.setUserState()
     } catch (err) {
       this.error = err.message;
     } finally {
@@ -133,8 +134,16 @@ export class User {
     }
   }
 
-  isAuthenticated() {
+  async isAuthenticated() {
+    if (!this.user)
+      await this.getProfile()
     return !!this.token && !!this.user?.email;
+  }
+
+  async isAdminUser() {
+    if (!this.user)
+      await this.getProfile()
+    return !!this.token && !!this.user?.email && this.user?.is_admin;
   }
 }
 
