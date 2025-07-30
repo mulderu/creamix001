@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# use dcmtk : tcm toolkit
+#
 # ex: ./convert_series.sh <input_dir> <output_dir>
 # ex: ./convert_series.sh ./dicom_series ./images
 
@@ -7,7 +9,7 @@ INPUT_DIR="$1"
 OUTPUT_DIR="$2"
 
 if [ -z "$INPUT_DIR" ] || [ -z "$OUTPUT_DIR" ]; then
-  echo "❌ usage: $0 <input_dir> <output_dir>"
+  echo "usage: $0 <input_dir> <output_dir>"
   exit 1
 fi
 

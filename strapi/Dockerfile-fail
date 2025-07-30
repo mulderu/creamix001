@@ -1,7 +1,14 @@
-FROM node:22-alpine
-# Installing libvips-dev for sharp Compatibility
-RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev nasm bash vips-dev git
-# RUN apt update && apt install -y dcmtk
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y curl gnupg
+
+# Add NodeSource APT repository
+RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
+
+# Install Node.js
+RUN apt-get install -y nodejs
+RUN apt update && apt install -y dcmtk
+
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
 

@@ -420,45 +420,38 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    dcms: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
     excluded: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    institution_name: Schema.Attribute.String;
+    InstanceNumber: Schema.Attribute.String;
+    instances: Schema.Attribute.JSON;
+    InstitutionName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
       Schema.Attribute.Private;
-    manufacturer: Schema.Attribute.String;
-    manufacturer_model_name: Schema.Attribute.String;
-    modality: Schema.Attribute.Enumeration<
-      ['CT', 'MR', 'X-RAY', 'PANO', 'US', 'IMAGE', 'NIFTI']
-    > &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'CT'>;
-    patient_birth_date: Schema.Attribute.String;
-    patient_id: Schema.Attribute.String;
-    patient_name: Schema.Attribute.String;
-    patient_sex: Schema.Attribute.Enumeration<['M', 'W', 'X']> &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'M'>;
+    Modality: Schema.Attribute.String;
+    patient: Schema.Attribute.Relation<'manyToOne', 'api::patient.patient'>;
+    PatientBirthDate: Schema.Attribute.String;
+    PatientID: Schema.Attribute.String;
+    PatientName: Schema.Attribute.String;
+    PatientSex: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    res_x: Schema.Attribute.Integer;
-    res_y: Schema.Attribute.Integer;
-    res_z: Schema.Attribute.Integer;
-    series_description: Schema.Attribute.String;
-    series_instance_uid: Schema.Attribute.String;
-    series_number: Schema.Attribute.String;
-    series_timestamp: Schema.Attribute.String;
+    SeriesDate: Schema.Attribute.String;
+    SeriesDescription: Schema.Attribute.String;
+    SeriesInstanceUID: Schema.Attribute.String;
+    SeriesNumber: Schema.Attribute.String;
+    SeriesTime: Schema.Attribute.String;
+    SOPInstanceUID: Schema.Attribute.String;
     source: Schema.Attribute.Enumeration<['upload', 'import']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'upload'>;
-    study_description: Schema.Attribute.String;
-    study_id: Schema.Attribute.String;
-    study_instance_uid: Schema.Attribute.String;
-    study_timestamp: Schema.Attribute.String;
+    StudyDate: Schema.Attribute.String;
+    StudyDescription: Schema.Attribute.String;
+    StudyInstanceUID: Schema.Attribute.String;
+    StudyTime: Schema.Attribute.String;
     tasks: Schema.Attribute.Relation<'oneToMany', 'api::task.task'>;
-    tasks_finished_count: Schema.Attribute.Integer;
-    tasks_new_count: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
-    tasks_processing_count: Schema.Attribute.Integer &
-      Schema.Attribute.DefaultTo<0>;
-    tasks_total_count: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -525,6 +518,38 @@ export interface ApiMulderMulder extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPatientPatient extends Struct.CollectionTypeSchema {
+  collectionName: 'patients';
+  info: {
+    displayName: 'patient';
+    pluralName: 'patients';
+    singularName: 'patient';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    cases: Schema.Attribute.Relation<'oneToMany', 'api::case.case'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::patient.patient'
+    > &
+      Schema.Attribute.Private;
+    PatientBirthDate: Schema.Attribute.String;
+    PatientID: Schema.Attribute.String;
+    PatientName: Schema.Attribute.String;
+    PatientSex: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1139,6 +1164,7 @@ declare module '@strapi/strapi' {
       'api::case.case': ApiCaseCase;
       'api::config.config': ApiConfigConfig;
       'api::mulder.mulder': ApiMulderMulder;
+      'api::patient.patient': ApiPatientPatient;
       'api::project.project': ApiProjectProject;
       'api::task.task': ApiTaskTask;
       'api::worker.worker': ApiWorkerWorker;

@@ -18,6 +18,7 @@ services:
       APP_KEYS: ${APP_KEYS}
       NODE_ENV: ${NODE_ENV}
       HOST: ${HOST}
+      HOST_IP: "192.168.1.80"
     entrypoint: ["yarn", "dev"] # for developemnt mode
     # entrypoint: ["tail", "-f", "/dev/null"] # for developemnt mode
     ports:
@@ -34,6 +35,22 @@ services:
       - postgres
     networks:
       - strapi-network
+
+  fastapi:
+    build:
+      context: ./xserver
+    restart: always
+    container_name: "fastapi"
+    environment:
+      HOST_IP: "192.168.1.80"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - strapi
+    volumes:
+      - ./xserver:/app
+      - ./public:/opt/app/public
+
 
   postgres:
     image: ${POSTGRES_IMAGE}
