@@ -13,6 +13,9 @@ import dicomutil as du
 class DcmCvtRequest(BaseModel):
     urls: List[str]
 
+class FileList(BaseModel):
+    files: List[str]
+
 
 app = FastAPI()
 
@@ -67,6 +70,20 @@ def api_dcmconvert(job_id: str, dcmreq: DcmCvtRequest):
   print(full_data)
 
   return {"job_id": job_id, "dtags": full_data}
+
+@app.post("/api/filejob/{job_id}")
+def api_dcmconvert(job_id: str, freq: FileList):
+  # files = os.listdir(UPLOAD_DIRECTORY)
+  r_list = []
+  for apath in freq.files:
+    print('apath:', apath)
+    a_file_path = f"{PUBLIC_DIRECTORY}{apath}"
+
+    if job_id == 'del001':
+      os.unlink(a_file_path)
+      r_list.append({'cmd': 'del', 'path': a_file_path})
+
+  return {"job_id": job_id, "data": r_list}
 
 
 # @app.post("/posts/", response_model=BlogPostRead)

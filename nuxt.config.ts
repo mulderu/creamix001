@@ -16,6 +16,7 @@ export default defineNuxtConfig({
        public: {
          apiBase: process.env.API_BASE || 'http://localhost:1337',
          admToken: process.env.APP_ADM_TOKEN,
+         uploadServer: process.env.UPLOAD_SERVER || 'http://192.168.1.80:2337',
        }
      },
 

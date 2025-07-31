@@ -1,5 +1,5 @@
 <script setup>
-import NewTaskSheet from "~/components/NewTaskSheet.vue";
+import { usePatientStore } from "~/stores/patientStore";
 
 const drawer = shallowRef(true);
 const end_drawer = shallowRef(false);
@@ -7,38 +7,12 @@ const tab = shallowRef("patient");
 const searchPCode = shallowRef("");
 const svc = { userStore: null };
 const router = useRouter();
+const patientStore = usePatientStore()
 
 onMounted(async () => {
   svc.userStore = useUserStore();
-
-  console.log(svc.userStore.user.user);
+  await patientStore.fetch([], [], ['cases'])
 });
-
-const favorites = [
-  {
-    icon: "mdi-view-dashboard-outline",
-    title: "Data Table",
-    link: "/sample/dtable",
-  },
-  {
-    icon: "mdi-bookmark-outline",
-    title: "Form",
-    link: "/sample/form",
-  },
-  {
-    icon: "mdi-message-outline",
-    title: "Messages",
-    badge: "3",
-  },
-  {
-    icon: "mdi-account-group-outline",
-    title: "Team",
-  },
-  {
-    icon: "mdi-calendar-outline",
-    title: "Calendar",
-  },
-];
 
 const applications = [
   {
@@ -82,13 +56,18 @@ const onSubItem = (item) => {
   }
 };
 
-const onAddTask = () => {
+const openNewCaseForm = () => {
   end_drawer.value = true;
 };
 
 const onClickSearchPCode = () => {
   console.log("onClickSearchPCode:", searchPCode.value);
 };
+
+const newCaseUploaded = async () => {
+  await patientStore.fetch([], [], ['cases'])
+  end_drawer.value = false;
+}
 </script>
 
 <template>
@@ -128,8 +107,8 @@ const onClickSearchPCode = () => {
 
               <v-btn
                 class="w-50 text-none"
-                prepend-icon="mdi-apps"
-                text="Apps"
+                prepend-icon="mdi-file-document-multiple"
+                text="AI"
                 value="apps"
                 variant="flat"
               />
@@ -140,35 +119,21 @@ const onClickSearchPCode = () => {
             <v-window v-model="tab">
               <v-window-item value="patient">
                 <v-list color="surface-variant" nav variant="text">
-                  <v-list-item rounded="lg" class="mb-2" border>
-                    <v-text-field
-                      v-model="searchPCode"
-                      :loading="loading"
-                      append-inner-icon="mdi-magnify"
-                      density="compact"
-                      label="Search"
-                      variant="solo"
-                      hide-details
-                      single-line
-                      @keyup.enter="onClickSearchPCode"
-                      @click:append-inner="onClickSearchPCode"
-                    ></v-text-field>
-                  </v-list-item>
                   <v-list-item
-                    v-for="(item, i) in favorites"
+                    v-for="(item, i) in patientStore.data"
                     :key="i"
                     border
                     class="mb-2"
-                    :prepend-icon="item.icon"
+                    prepend-icon="mdi-account"
                     rounded="lg"
-                    :title="item.title"
-                    :value="item.title"
-                    :href="item.link"
+                    :title="item.PatientID + `(${item.PatientName})`"
+                    :value="item.id"
+                    :href="`/patient/${item.documentId}`"
                   >
-                    <template v-if="item.badge" #append>
+                    <template v-if="item.cases" #append>
                       <v-badge
                         color="text-medium-emphasis"
-                        :content="item.badge"
+                        :content="item.cases.length"
                         inline
                       />
                     </template>
@@ -214,13 +179,18 @@ const onClickSearchPCode = () => {
           >
             <div class="d-flex align-center mb-2 mb-sm-0 flex-1-0">
               <v-app-bar-nav-icon
-                v-if="$vuetify.display.smAndDown"
                 @click="drawer = !drawer"
               />
 
-              <span class="text-h6">Welcome back, John!</span>
+              <span class="text-h6"
+                v-if="patientStore.patient"
+              > 
+              {{ patientStore.patient.PatientID }} ( {{ patientStore.patient.PatientName  }} )
+              </span>
 
+              <!--
               <v-icon class="ms-2">mdi-hand-wave</v-icon>
+              -->
             </div>
 
             <div class="d-flex align-center ga-4 flex-1-1 justify-end">
@@ -252,7 +222,7 @@ const onClickSearchPCode = () => {
                     slim
                     text="Add"
                     variant="flat"
-                    @click="onAddTask"
+                    @click="openNewCaseForm"
                   />
                 </template>
               </v-text-field>
@@ -279,7 +249,7 @@ const onClickSearchPCode = () => {
           temporary
           :width="$vuetify.display.mdAndUp ? 420 : 280"
         >
-          <v-card-item title="New Address">
+          <v-card-item title="New Case">
             <template #append>
               <v-btn
                 density="compact"
@@ -291,8 +261,8 @@ const onClickSearchPCode = () => {
           </v-card-item>
 
           <div class="pa-4">
-            <v-sheet border="dashed md" height="565" rounded="lg" width="100%">
-              <NewTaskSheet />
+            <v-sheet height="565" rounded="lg" width="100%">
+              <new-case-sheet @uploaded="newCaseUploaded"/>
             </v-sheet>
           </div>
         </v-navigation-drawer>

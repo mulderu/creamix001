@@ -73,8 +73,9 @@ const decodeUtf8 = (encoded) => {
         </ul>
         <ul v-else>
           <li class="border-b-sm" v-for="row in caseStore.data" :key="row.id">
-            {{ row.PatientID }} / {{ decodeUtf8(row.PatientName) }} / {{ row.SeriesNumber }} /
+            {{ row.PatientID }} / {{ row.PatientName }} / {{ row.SeriesNumber }} /
             {{ row.Modality }} / {{ row.SeriesDate}} / {{ row.SeriesTime}} / {{ row.StudyDescription }} / {{ row.SeriesDescription }}
+            / {{ row.dcms.length }}
             <v-btn color="primary" @click="deleteCase(row.documentId)">DEL</v-btn>
           </li>
         </ul>
