@@ -15,7 +15,8 @@
 // not use
 export const useStrapiApi = () => {
   const config = useRuntimeConfig();
-  const token = useState("auth_token");
+  const state_token = useState("auth_token");
+  const token = state_token.value ? state_token : {value: localStorage.getItem('token')};
 
   const fetchWithAuth = async (url, options = {}) => {
     const headers = options.headers || {};

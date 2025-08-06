@@ -8,11 +8,11 @@ WORKDIR /app
 COPY . /app
 
 # 
-RUN apt update && apt install -y dcmtk libgl1-mesa-glx
+RUN apt update && apt install -y dcmtk libgl1-mesa-glx libgdcm-dev libgdcm-tools dcm2niix
 
 # Install any necessary dependencies
 RUN pip install --no-cache-dir fastapi uvicorn[standard] redis starlette itsdangerous \
- pillow pydicom opencv-python-headless
+ pillow pydicom opencv-python-headless dicom2nifti
 
 # Expose the port the app runs on
 EXPOSE 8000

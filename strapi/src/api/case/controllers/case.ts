@@ -58,11 +58,13 @@ export default factories.createCoreController('api::case.case', ({ strapi }) => 
     for (let series_id in pythonData.dtags) {
       console.log('series_id:', series_id)
       const series = pythonData.dtags[series_id]
-      const fInstance = series[0]
-
+      const { thumb, nii } = series
+      const fInstance = series['instances'][0]
       const { PatientID, PatientName, PatientSex, PatientBirthDate} = fInstance
 
-      postData['instances'] = series.map(d => ({SOPInstanceUID: d.SOPInstanceUID, InstanceNumber: d.InstanceNumber, dcm_file: d.dcm_file, png_path: d.png_path}))
+      postData['instances'] = series['instances'].map(d => ({
+        SOPInstanceUID: d.SOPInstanceUID, InstanceNumber: d.InstanceNumber,
+        dcm_file: d.dcm_file, png_path: d.png_path }))
 
       const aPatient = await strapi.query('api::patient.patient').findOne({
         where: {
@@ -73,7 +75,8 @@ export default factories.createCoreController('api::case.case', ({ strapi }) => 
       if(!aPatient) {
         // insert
         const newPatient = await strapi.entityService.create('api::patient.patient', {
-          data: { PatientID, PatientName, PatientSex, PatientBirthDate, CreatedById, UpdateById, PublishedAt }
+          data: { PatientID, PatientName, PatientSex
+            , PatientBirthDate, CreatedById, UpdateById, PublishedAt }
         })
 
         console.log('addNewPatient:', newPatient)
@@ -90,7 +93,8 @@ export default factories.createCoreController('api::case.case', ({ strapi }) => 
       });
 
       if (!aCase) {
-        const newData = { ...postData, ...fInstance, CreatedById, UpdateById, PublishedAt }
+        const newData = { ...postData, ...fInstance, thumb, nii
+          , CreatedById, UpdateById, PublishedAt }
         // console.log('newData:', newData)
         const newCase = await strapi.entityService.create('api::case.case', {
           data: newData

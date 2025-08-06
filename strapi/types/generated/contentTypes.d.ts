@@ -432,6 +432,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::case.case'> &
       Schema.Attribute.Private;
     Modality: Schema.Attribute.String;
+    nii: Schema.Attribute.String;
     patient: Schema.Attribute.Relation<'manyToOne', 'api::patient.patient'>;
     PatientBirthDate: Schema.Attribute.String;
     PatientID: Schema.Attribute.String;
@@ -452,6 +453,7 @@ export interface ApiCaseCase extends Struct.CollectionTypeSchema {
     StudyInstanceUID: Schema.Attribute.String;
     StudyTime: Schema.Attribute.String;
     tasks: Schema.Attribute.Relation<'oneToMany', 'api::task.task'>;
+    thumb: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

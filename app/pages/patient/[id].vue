@@ -39,7 +39,7 @@ definePageMeta({
         <v-card :ripple="false" rounded="lg">
           <v-card-item class="py-4">
             <div class="d-flex align-center justify-space-between mb-4">
-              <v-avatar :image="config.public.uploadServer + item.mimg" size="60" />
+              <v-avatar :image="config.public.uploadServer + item.thumb" size="60" />
               <v-chip
                 v-if="item.instances.length"
                 color="info"
@@ -75,13 +75,19 @@ definePageMeta({
               prepend-icon="mdi-rocket-launch"
               text="Predict"
               tile
+              target="_blank"
+              :href="`/predict/${route.params.id}?case=${item.documentId}`"
             >
               <template #prepend>
                 <v-icon color="medium-emphasis" />
               </template>
             </v-btn>
 
-            <v-btn class="flex-grow-1 text-none" flat text="Details" tile />
+            <v-btn class="flex-grow-1 text-none" flat 
+              text="Details" tile 
+              target="_blank"
+              :href="`/case/${route.params.id}?case=${item.documentId}`"
+              />
           </v-btn-group>
         </v-card>
       </v-col>

@@ -109,6 +109,12 @@
     },
     "instances": {
       "type": "json"
+    },
+    "thumb": {
+      "type": "string"
+    },
+    "nii": {
+      "type": "string"
     }
   }
 }
