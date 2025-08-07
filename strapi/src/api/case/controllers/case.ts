@@ -50,61 +50,73 @@ export default factories.createCoreController('api::case.case', ({ strapi }) => 
     // console.log('dcmFiles:', dcmFiles)
     // const { data: pythonData } = await axios.get(`http://${process.env.HOST_IP}:8000/api/demo/hixxx`);
 
-    const { data: pythonData } = await axios.post(
-      `http://${process.env.HOST_IP}:8000/api/dcmconvert/hixxx`, {
-        urls: dcmFiles.map(d => d.url)
-      });
+    try {
+      const { data: pythonData } = await axios.post(
+        `http://${process.env.HOST_IP}:8000/api/dcmconvert/hixxx`, {
+          urls: dcmFiles.map(d => d.url)
+        });
 
-    for (let series_id in pythonData.dtags) {
-      console.log('series_id:', series_id)
-      const series = pythonData.dtags[series_id]
-      const { thumb, nii } = series
-      const fInstance = series['instances'][0]
-      const { PatientID, PatientName, PatientSex, PatientBirthDate} = fInstance
-
-      postData['instances'] = series['instances'].map(d => ({
-        SOPInstanceUID: d.SOPInstanceUID, InstanceNumber: d.InstanceNumber,
-        dcm_file: d.dcm_file, png_path: d.png_path }))
-
-      const aPatient = await strapi.query('api::patient.patient').findOne({
-        where: {
-          PatientID
-        },
-      });
-
-      if(!aPatient) {
-        // insert
-        const newPatient = await strapi.entityService.create('api::patient.patient', {
-          data: { PatientID, PatientName, PatientSex
-            , PatientBirthDate, CreatedById, UpdateById, PublishedAt }
-        })
-
-        console.log('addNewPatient:', newPatient)
-        postData['patient'] = newPatient.id
-      } else {
-        console.log('exitstPatient:', aPatient)
-        postData['patient'] = aPatient.id
+      if (pythonData.code > 200) {
+        console.log('Error-Code from fastapi:', pythonData.code)
+        return { data: null }
       }
 
-      const aCase = await strapi.query('api::case.case').findOne({
-        where: {
-          SeriesInstanceUID: series_id
-        },
-      });
+      for (let series_id in pythonData.dtags) {
+        console.log('series_id:', series_id)
+        const series = pythonData.dtags[series_id]
+        const { thumb, nii } = series
+        const fInstance = series['instances'][0]
+        const { PatientID, PatientName, PatientSex, PatientBirthDate} = fInstance
 
-      if (!aCase) {
-        const newData = { ...postData, ...fInstance, thumb, nii
-          , CreatedById, UpdateById, PublishedAt }
-        // console.log('newData:', newData)
-        const newCase = await strapi.entityService.create('api::case.case', {
-          data: newData
-        })
-        responseData.push(newCase)
-        console.log('addNewCase:', newCase)
-      } else {
-        responseData.push(aCase)
-        console.log('already:', aCase)
+        postData['instances'] = series['instances'].map(d => ({
+          SOPInstanceUID: d.SOPInstanceUID, InstanceNumber: d.InstanceNumber,
+          dcm_file: d.dcm_file, png_path: d.png_path }))
+
+        const aPatient = await strapi.query('api::patient.patient').findOne({
+          where: {
+            PatientID
+          },
+        });
+
+        if(!aPatient) {
+          // insert
+          const newPatient = await strapi.entityService.create('api::patient.patient', {
+            data: { PatientID, PatientName, PatientSex
+              , PatientBirthDate, CreatedById, UpdateById, PublishedAt }
+          })
+
+          console.log('addNewPatient:', newPatient)
+          postData['patient'] = newPatient.id
+        } else {
+          console.log('exitstPatient:', aPatient)
+          postData['patient'] = aPatient.id
+        }
+
+        const aCase = await strapi.query('api::case.case').findOne({
+          where: {
+            SeriesInstanceUID: series_id
+          },
+        });
+
+        if (!aCase) {
+          const newData = { ...postData, ...fInstance, thumb, nii
+            , CreatedById, UpdateById, PublishedAt }
+          // console.log('newData:', newData)
+          const newCase = await strapi.entityService.create('api::case.case', {
+            data: newData
+          })
+          responseData.push(newCase)
+          console.log('addNewCase:', newCase)
+        } else {
+          responseData.push(aCase)
+          console.log('already:', aCase)
+        }
       }
+
+    } catch(err) {
+      console.error('Responce Error from fastapi or process error')
+      console.error(err)
+      return { data: null }
     }
 
     return { data: responseData };

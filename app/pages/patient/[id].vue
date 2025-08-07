@@ -86,7 +86,7 @@ definePageMeta({
             <v-btn class="flex-grow-1 text-none" flat 
               text="Details" tile 
               target="_blank"
-              :href="`/case/${route.params.id}?case=${item.documentId}`"
+              :href="`/case${item.Modality.toLowerCase()}/${route.params.id}?case=${item.documentId}`"
               />
           </v-btn-group>
         </v-card>

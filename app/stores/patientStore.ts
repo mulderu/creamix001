@@ -23,6 +23,9 @@ export const usePatientStore = defineStore('patientStore', {
     loading: true,
   }),
   actions: {
+    decodePName(pn: string) {
+      return decodeUtf8(pn)
+    },
     async fetchPatient(documentId: string) {
       this.loading = true
       const r = await fetchWithAuth(`/api/patients/${documentId}?populate[0]=cases`, {

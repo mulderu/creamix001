@@ -9,6 +9,7 @@ import json
 import os
 import shutil
 import dicomutil as du
+from types import SimpleNamespace
 
 class DcmCvtRequest(BaseModel):
     urls: List[str]
@@ -41,44 +42,41 @@ def api_dcmconvert(job_id: str, dcmreq: DcmCvtRequest):
   { "instances": [{tags}, {}, ...], "thumb": "....png", "nii": ".....nii.gz" }
   '''
   # files = os.listdir(UPLOAD_DIRECTORY)
+  # full_data[sid] = {"id": sid, "instances": [], "thumb":"", "nii": ""}
+  success_code = 0
   full_data = du.copyDcmAndParse(PUBLIC_DIRECTORY, DCMPNG_DIRECTORY, dcmreq.urls)
   cmd_list = []
   for sid in full_data:
     instanceList = full_data[sid]["instances"]
     instanceList.sort(key=lambda x: x["InstanceNumber"])
     mid_instance = instanceList[len(instanceList)//2]
-    a_sid_dir = f"{DCMPNG_DIRECTORY}/{sid}"
-    a_png_path = f"{a_sid_dir}/0000_{mid_instance['SeriesNumber']}_{mid_instance['InstanceNumber']}.png"
-    full_data[sid]["thumb"] = a_png_path.replace(PUBLIC_DIRECTORY, '')
-    
-    if os.path.exists(a_png_path):
-      print('Alread exits pngs:', a_png_path)
-    else:
-      pngcvt_cmd = f"dcmj2pnm +oj {mid_instance['dcm_path']} {a_png_path}"
-      cmd_list.append(pngcvt_cmd)
+    modality = mid_instance["Modality"].lower() 
+    print('sid:', sid, ', modality:', modality, ', dcm-len:', len(instanceList))
 
-    if len(instanceList)>5:
-      a_nii_path = f"{a_sid_dir}/0000_{mid_instance['SeriesNumber']}.nii.gz"
-      full_data[sid]["nii"] = a_nii_path.replace(PUBLIC_DIRECTORY, '')
-
-      if os.path.exists(a_nii_path):
-        print('Alread exits nii:', a_nii_path)
+    if modality in ['ct', 'px', 'dx']:
+      a_sid_dir = f"{DCMPNG_DIRECTORY}/{sid}"
+      a_png_path = f"{a_sid_dir}/0000_{mid_instance['SeriesNumber']}_{mid_instance['InstanceNumber']}.png"
+      full_data[sid]["thumb"] = a_png_path.replace(PUBLIC_DIRECTORY, '')
+      
+      if os.path.exists(a_png_path):
+        print('Alread exits pngs:', a_png_path)
       else:
-        # copy all dicom to temp dir
-        def makeNiiGetPath(aDcmDir):
-          print('makeNii:', aDcmDir)
-          niiList = du.makeDcms2Nii(aDcmDir, a_sid_dir)
-          print('niiList:', niiList)
-          return niiList[0] if len(niiList) > 0 else ''
+        pngcvt_cmd = f"dcmj2pnm +oj {mid_instance['dcm_path']} {a_png_path}"
+        cmd_list.append(pngcvt_cmd)
 
-        niiFName = makeNiiGetPath(a_sid_dir)
-        if niiFName != '':
-          cmd_list.append(f"mv {a_sid_dir}/{niiFName} {a_nii_path}")
-
+      if modality == 'ct':
+        r = du.processCTData(sid, mid_instance, full_data
+                         , cmd_list, a_sid_dir, DCMPNG_DIRECTORY, PUBLIC_DIRECTORY)
+        if r == -1:
+          success_code = 401 # fail for CT Process
+    else:
+      print("We don't process this modality:", modality)
+      success_code = 400 # fail for modality
+        
   du.multipCmd(cmd_list)
   # print(full_data)
 
-  return {"job_id": job_id, "dtags": full_data}
+  return {"job_id": job_id, "dtags": full_data, "code": success_code}
 
 @app.post("/api/filejob/{job_id}")
 def api_filejob(job_id: str, freq: FileList):

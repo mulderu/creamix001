@@ -13,25 +13,31 @@ import dicom2nifti
 
 def copyDcmAndParse(pub_dir, dcm_dir, uploadURLs):
   full_data = {} 
-  for upUrl in uploadURLs:
-    # print('url:', upUrl)
-    a_public_path = f"{pub_dir}{upUrl}"
-    dcm_tags = getDcmTags(a_public_path)
-    sid = dcm_tags['SeriesInstanceUID']
-    a_sid_dir = f"{dcm_dir}/{sid}"
-    os.makedirs(a_sid_dir, exist_ok=True)
-    a_dcm_path = f"{a_sid_dir}{upUrl.replace('/uploads', '')}"
-    # copy dcm to sid dir
-    shutil.copyfile(a_public_path, a_dcm_path)
-    # print('copy dcm:', a_public_path, a_dcm_path)
+  try:
+    for upUrl in uploadURLs:
+      # print('url:', upUrl)
+      a_public_path = f"{pub_dir}{upUrl}"
+      dcm_tags = getDcmTags(a_public_path)
+      sid = dcm_tags['SeriesInstanceUID']
+      a_sid_dir = f"{dcm_dir}/{sid}"
+      os.makedirs(a_sid_dir, exist_ok=True)
+      a_dcm_path = f"{a_sid_dir}{upUrl.replace('/uploads', '')}"
+      # copy dcm to sid dir
+      shutil.copyfile(a_public_path, a_dcm_path)
+      # todo: delete original file (if it is not neccessary)
+      # print('copy dcm:', a_public_path, a_dcm_path)
 
-    if sid not in full_data:
-      full_data[sid] = {"id": sid, "instances": [], "thumb":"", "nii": ""}
+      if sid not in full_data:
+        full_data[sid] = {"id": sid, "instances": [], "thumb":"", "nii": ""}
 
-    dcm_tags["dcm_path"] = a_dcm_path
-    dcm_tags["dcm_file"] = a_dcm_path.replace(pub_dir, "")
-    full_data[sid]["instances"].append(dcm_tags)
-  return full_data
+      dcm_tags["dcm_path"] = a_dcm_path
+      dcm_tags["dcm_file"] = a_dcm_path.replace(pub_dir, "")
+      full_data[sid]["instances"].append(dcm_tags)
+    return full_data
+  except Exception as err:
+    print("copyDcmAndParse error:", err)
+    return full_data
+
 
 
 def makeDcms2Nii(dcm_dir, out_dir):
@@ -91,3 +97,28 @@ def getDcmTags(a_file):
       "SeriesTime": a_dicom.SeriesTime,
       "SeriesDescription": a_dicom.SeriesDescription,
     }
+
+# CT
+def processCTData(sid, mid_instance, full_data, cmd_list, a_sid_dir, dcm_dir, pub_dir):
+    a_nii_path = f"{a_sid_dir}/0000_{mid_instance['SeriesNumber']}.nii.gz"
+    full_data[sid]["nii"] = a_nii_path.replace(pub_dir, '')
+
+    try:
+      if os.path.exists(a_nii_path):
+        print('Alread exits nii:', a_nii_path)
+        return 1
+      else:
+        # copy all dicom to temp dir
+        def makeNiiGetPath(aDcmDir):
+          print('makeNii:', aDcmDir)
+          niiList = makeDcms2Nii(aDcmDir, a_sid_dir)
+          print('niiList:', niiList)
+          return niiList[0] if len(niiList) > 0 else ''
+
+        niiFName = makeNiiGetPath(a_sid_dir)
+        if niiFName != '':
+          cmd_list.append(f"mv {a_sid_dir}/{niiFName} {a_nii_path}")
+        return 0
+    except Exception as err:
+      print("processCTData error:", err)
+      return -1
